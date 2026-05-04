@@ -1,7 +1,6 @@
 import os
 import io
 import time
-import joblib
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -32,8 +31,6 @@ st.set_page_config(
 )
 
 DATA_PATH = "data/BankChurners.csv"
-MODEL_PATH = "models/catboost_bo.cbm"
-META_PATH = "models/model_metadata.pkl"
 
 TARGET_COL = "Attrition_Flag"
 DROP_COLS = [
@@ -312,20 +309,8 @@ def evaluate_model(model, X_test, y_test, threshold=0.5):
     }
     return metrics, y_pred, y_prob
 
-
-def save_model_and_metadata(model, metadata):
-    os.makedirs("models", exist_ok=True)
-    model.save_model(MODEL_PATH)
-    joblib.dump(metadata, META_PATH)
-
-
 def load_saved_model():
-    if not os.path.exists(MODEL_PATH) or not os.path.exists(META_PATH):
-        return None, None
-    model = CatBoostClassifier()
-    model.load_model(MODEL_PATH)
-    metadata = joblib.load(META_PATH)
-    return model, metadata
+    return st.session_state.get("model"), st.session_state.get("metadata")
 
 # ======================================================
 # DATA DEFAULT
@@ -543,12 +528,13 @@ elif menu == "Training & Optimasi":
             "y_prob_bo": y_prob_bo,
             "training_time_seconds": time.time() - start_time,
         }
-        save_model_and_metadata(bo_model, metadata)
+        st.session_state["model"] = bo_model
+        st.session_state["metadata"] = metadata
 
         st.session_state["model"] = bo_model
         st.session_state["metadata"] = metadata
 
-        st.success("Model final berhasil dilatih dan disimpan ke folder models/.")
+        st.success("Model final berhasil dilatih/.")
         st.subheader("Perbandingan Model")
         st.dataframe(compare_df, use_container_width=True)
 
