@@ -101,24 +101,26 @@ def clean_dataset(df: pd.DataFrame, has_target: bool = True):
     data = df.copy()
     data = data.drop(columns=[c for c in DROP_COLS if c in data.columns], errors="ignore")
 
-    if has_target and TARGET_COL in data.columns:
-         target_as_text = data[TARGET_COL].astype(str).str.strip()
-            mapped_target = target_as_text.map({
-                "Existing Customer": 0,
-                "Attrited Customer": 1,
-                "Existing": 0,
-                "Attrited": 1,
-                "0": 0,
-                "1": 1,
-            })
-        
-            unknown_values = target_as_text[mapped_target.isna()].dropna().unique()
-            if len(unknown_values) > 0:
-                raise ValueError(
-                    f"Nilai target {TARGET_COL} tidak dikenali: {list(unknown_values)}"
-                )
-        
-            data[TARGET_COL] = mapped_target.astype(int)
+     if has_target and TARGET_COL in data.columns:
+        target_as_text = data[TARGET_COL].astype(str).str.strip()
+
+        mapped_target = target_as_text.map({
+            "Existing Customer": 0,
+            "Attrited Customer": 1,
+            "Existing": 0,
+            "Attrited": 1,
+            "0": 0,
+            "1": 1,
+        })
+
+        unknown_values = target_as_text[mapped_target.isna()].dropna().unique()
+
+        if len(unknown_values) > 0:
+            st.error(f"Nilai target {TARGET_COL} tidak dikenali.")
+            st.write("Nilai yang tidak dikenali:", list(unknown_values))
+            st.stop()
+
+        data[TARGET_COL] = mapped_target.astype(int)
 
     return data
 
