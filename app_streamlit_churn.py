@@ -705,7 +705,27 @@ elif menu == "Prediksi Churn":
             submitted = st.form_submit_button("Prediksi", use_container_width=True)
 
         if submitted:
-            input_df = pd.DataFrame([{col: locals()[col] for col in FEATURE_COLUMNS}])
+            input_df = pd.DataFrame([{
+                "Customer_Age": Customer_Age,
+                "Gender": Gender,
+                "Dependent_count": Dependent_count,
+                "Education_Level": Education_Level,
+                "Marital_Status": Marital_Status,
+                "Income_Category": Income_Category,
+                "Card_Category": Card_Category,
+                "Months_on_book": Months_on_book,
+                "Total_Relationship_Count": Total_Relationship_Count,
+                "Months_Inactive_12_mon": Months_Inactive_12_mon,
+                "Contacts_Count_12_mon": Contacts_Count_12_mon,
+                "Credit_Limit": Credit_Limit,
+                "Total_Revolving_Bal": Total_Revolving_Bal,
+                "Avg_Open_To_Buy": Avg_Open_To_Buy,
+                "Total_Amt_Chng_Q4_Q1": Total_Amt_Chng_Q4_Q1,
+                "Total_Trans_Amt": Total_Trans_Amt,
+                "Total_Trans_Ct": Total_Trans_Ct,
+                "Total_Ct_Chng_Q4_Q1": Total_Ct_Chng_Q4_Q1,
+                "Avg_Utilization_Ratio": Avg_Utilization_Ratio,
+            }])
             X_input = prepare_features(input_df)
             p = float(get_prediction_proba(model, X_input)[0])
             pred = "Churn" if p >= .5 else "Tidak Churn"
